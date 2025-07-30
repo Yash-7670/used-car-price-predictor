@@ -94,16 +94,16 @@ The Flask application is located in the `app/` directory. It provides a user int
 ## 📸 Screenshots
 
 ### 🏠 Main Page
-![Main Page](images/MainPage.png)
+![Main Page](Images/MainPage.png)
 
 ### 🚗 Select Brand
-![Select Brand](images/SelectBrand.png)
+![Select Brand](Images/SelectBrand.png)
 
 ### 🚙 Select Model
-![Select Model](images/SelectModel.png)
+![Select Model](Images/SelectModel.png)
 
 ### ⚙️ Auto-Filled Options Based on Dataset
-![Auto Options](images/OtherOptionsAutomaticByDataset.png)
+![Auto Options](Images/OtherOptionsAutoFillByDataset.png)
 
 ### 💰 Final Prediction with All Details
-![Final Prediction](images/FinalPricePredictionWithAllDetails.png)
+![Final Prediction](Images/FinalPricePredictionWithAllDetails.png)
