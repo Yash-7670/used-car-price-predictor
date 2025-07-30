@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Used Car Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f6f6fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a2a3a;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            background: #e0ffe0;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            border: 1px solid #7ac77a;
+        }
+
+        .result ul {
+            padding-left: 20px;
+        }
+
+        .result li {
+            margin: 5px 0;
+        }
+    </style>
+
+    <script>
+        async function fetchModels() {
+            const brand = document.getElementById("brand").value;
+            const modelSelect = document.getElementById("model");
+
+            modelSelect.innerHTML = '<option value="">Loading...</option>';
+            const formData = new FormData();
+            formData.append("brand", brand);
+
+            const response = await fetch("/get_models", {
+                method: "POST",
+                body: formData
+            });
+
+            const models = await response.json();
+            modelSelect.innerHTML = '<option value="">Select Model</option>';
+            models.forEach(model => {
+                const option = document.createElement("option");
+                option.value = model;
+                option.text = model;
+                modelSelect.appendChild(option);
+            });
+        }
+
+        async function fetchOptions() {
+            const brand = document.getElementById("brand").value;
+            const model = document.getElementById("model").value;
+            const formData = new FormData();
+            formData.append("brand", brand);
+            formData.append("model", model);
+
+            const response = await fetch("/get_options", {
+                method: "POST",
+                body: formData
+            });
+
+            const options = await response.json();
+            for (let key in options) {
+                const select = document.getElementById(key);
+                if (select && Array.isArray(options[key])) {
+                    select.innerHTML = `<option value="">Select ${key}</option>`;
+                    options[key].forEach(opt => {
+                        const option = document.createElement("option");
+                        option.value = opt;
+                        option.text = opt;
+                        select.appendChild(option);
+                    });
+                }
+            }
+
+            document.getElementById("car-details").style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Used Car Price Predictor 🚗</h1>
+
+        {% if prediction_text %}
+        <div class="result">
+            <h2>Predicted Price: {{ prediction_text }}</h2>
+            <h3>Car Info:</h3>
+            <ul>
+                {% for key, value in car_info.items() %}
+                    <li><strong>{{ key|capitalize }}:</strong> {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form action="/predict" method="POST">
+            <label for="brand">Brand:</label>
+            <select name="brand" id="brand" onchange="fetchModels(); document.getElementById('car-details').style.display='none';">
+                <option value="">Select Brand</option>
+                {% for brand in brands %}
+                    <option value="{{ brand }}">{{ brand }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="model">Model:</label>
+            <select name="model" id="model" onchange="fetchOptions()">
+                <option value="">Select Model</option>
+            </select>
+
+            <div id="car-details" style="display: none;">
+                <label for="km_driven">KM Driven:</label>
+                <select name="km_driven" id="km_driven"></select>
+
+                <label for="fuel">Fuel:</label>
+                <select name="fuel" id="fuel"></select>
+
+                <label for="seller_type">Seller Type:</label>
+                <select name="seller_type" id="seller_type"></select>
+
+                <label for="transmission">Transmission:</label>
+                <select name="transmission" id="transmission"></select>
+
+                <label for="owner">Owner:</label>
+                <select name="owner" id="owner"></select>
+
+                <label for="mileage">Mileage:</label>
+                <select name="mileage" id="mileage"></select>
+
+                <label for="engine">Engine (CC):</label>
+                <select name="engine" id="engine"></select>
+
+                <label for="max_power">Max Power (bhp):</label>
+                <select name="max_power" id="max_power"></select>
+
+                <label for="torque">Torque (Nm):</label>
+                <select name="torque" id="torque"></select>
+
+                <label for="seats">Seats:</label>
+                <select name="seats" id="seats"></select>
+
+                <label for="car_age">Car Age:</label>
+                <select name="car_age" id="car_age"></select>
+
+                <button type="submit">Predict Price</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
